@@ -1,7 +1,31 @@
 import axios from "axios";
 import { Probabilidad } from "../model/Tipos";
+import { consultarProbabilidadesOffline, existeNombre, guardarProbabilidad } from "./ConsultaAlmacenamientoInterno";
 
-async function consultarProbabilidades(
+async function consultarProbabilidades(nombre: string, onLine: boolean, usarCache: boolean){
+  let resultado = [];
+  if(onLine){
+    if(usarCache){
+      const existe = await existeNombre(nombre);
+      if(existe){
+        resultado = await consultarProbabilidadesOffline(nombre);
+      }else{
+        resultado = await consultarProbabilidadesApi(nombre);
+      }
+    }else{
+        resultado = await consultarProbabilidadesApi(nombre);
+    }
+  }else{
+    if(usarCache){
+      resultado = await consultarProbabilidadesOffline(nombre);
+    }
+  }
+
+  return resultado;
+  
+}
+
+async function consultarProbabilidadesApi(
   nombre: string
 ): Promise<Array<Probabilidad>> {
   const endpoint = `https://api.nationalize.io/`;
@@ -15,8 +39,10 @@ async function consultarProbabilidades(
 
   const respuestaServidor = await axios.get(endpoint, configuracion);
   const resultado = respuestaServidor.data.country;
-  const listaPromises = resultado.map(rellenarCampoPais)
-  return await Promise.all(listaPromises);
+  const listaPromises = resultado.map(rellenarCampoPais);
+  const resultados = await Promise.all(listaPromises);
+  await guardarProbabilidad(nombre, resultado);
+  return resultados;
 }
 
 async function rellenarCampoPais(objecto: Probabilidad): Promise<Probabilidad>{

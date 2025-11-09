@@ -8,7 +8,7 @@ type Props = {
 
 export default function CargaLayer({size = "large", color = "#0000ff"}: Props) {
   return (
-    <View>
+    <View style={styles.contenedor}>
       <Text style={styles.texto}>Cargando Datos</Text>
       <ActivityIndicator size={size} color={color} />
     </View>
