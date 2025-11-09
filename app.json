@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "test_app",
-    "slug": "test_app",
+    "name": "rn_nombres",
+    "slug": "rn_nombres",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
